@@ -9,6 +9,6 @@ import Foundation
 
 struct TodoItem: Equatable, Identifiable {
     let id: UUID
-    let title: String
-    let isCompleted: Bool = false
+    var title: String
+    var isCompleted: Bool = false
 }

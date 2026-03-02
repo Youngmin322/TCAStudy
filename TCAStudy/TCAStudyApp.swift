@@ -6,12 +6,17 @@
 //
 
 import SwiftUI
+import ComposableArchitecture
 
 @main
 struct TCAStudyApp: App {
     var body: some Scene {
         WindowGroup {
-            CounterView()
+            TodoListView(
+                store: Store(initialState: TodoListFeature.State()) {
+                    TodoListFeature()
+                }
+            )
         }
     }
 }
