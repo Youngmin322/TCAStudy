@@ -11,7 +11,7 @@ import ComposableArchitecture
 struct TodoListView: View {
     @Bindable var store: StoreOf<TodoListFeature>
     
-    var filteredTodos: [TodoItem] {
+    var filteredTodos: [TodoRowFeature.State] {
         switch store.filter {
         case .all:
             return Array(store.todos)
@@ -41,7 +41,7 @@ struct TodoListView: View {
                             Image(systemName: todo.isCompleted ? "checkmark.circle.fill" : "circle")
                                 .foregroundColor(todo.isCompleted ? .green : .gray)
                                 .onTapGesture {
-                                    store.send(.todoToggled(id: todo.id))
+                                    store.send(.todos(.element(id: todo.id, action: .toggleTapped)))
                                 }
                             
                             Text(todo.title)
@@ -52,7 +52,7 @@ struct TodoListView: View {
                     .onDelete { indexSet in
                         for index in indexSet {
                             let id = filteredTodos[index].id
-                            store.send(.todoDeleted(id: id))
+                            store.send(.todos(.element(id: id, action: .deleteTapped)))
                         }
                     }
                 }

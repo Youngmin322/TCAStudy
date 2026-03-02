@@ -12,7 +12,7 @@ import ComposableArchitecture
 struct TodoListFeature {
     @ObservableState
     struct State: Equatable {
-        var todos: IdentifiedArrayOf<TodoItem> = []
+        var todos: IdentifiedArrayOf<TodoRowFeature.State> = []
         var inputText: String = ""
         var filter: Filter = .all
         
@@ -26,9 +26,8 @@ struct TodoListFeature {
     enum Action {
         case inputTextChanged(String) // 텍스트 필드
         case addButtonTapped // 추가 버튼 탭
-        case todoToggled(id: UUID) // 완료 체크 초글
-        case todoDeleted(id: UUID) // 삭제
         case filterChanged(State.Filter) // 필터 변경
+        case todos(IdentifiedActionOf<TodoRowFeature>)
     }
     
     var body: some Reducer<State, Action> {
@@ -38,7 +37,7 @@ struct TodoListFeature {
             case let .inputTextChanged(text):
                 state.inputText = text
                 return .none
-                
+
                 
             case .addButtonTapped:
                 // 빈 문자열이면 무시
@@ -46,24 +45,29 @@ struct TodoListFeature {
                 else { return .none }
                 
                 // 새 Todo 만들어서 배열에 추가
-                let newTodo = TodoItem(id: UUID(), title: state.inputText)
+                let newTodo = TodoRowFeature.State(
+                    id: UUID(),
+                    title: state.inputText,
+                    isCompleted: false
+                )
                 state.todos.append(newTodo)
                 state.inputText = ""  // 입력창 초기화
                 return .none
                 
-            case let .todoToggled(id):
-                // id로 특정 아이템만 찾아서 토글
-                state.todos[id: id]?.isCompleted.toggle()
+            case let .todos(.element(id: id, action: .deleteTapped)):
+                state.todos.remove(id: id)
                 return .none
                 
-            case let .todoDeleted(id):
-                state.todos.remove(id: id)
+            case .todos:
                 return .none
                 
             case let .filterChanged(filter):
                 state.filter = filter
                 return .none
             }
+        }
+        .forEach(\.todos, action: \.todos) {
+            TodoRowFeature()
         }
     }
 }
