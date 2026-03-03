@@ -23,6 +23,8 @@ struct TodoListFeature {
         }
     }
     
+    @Dependency(\.uuid) var uuidGenerator
+    
     enum Action {
         case inputTextChanged(String) // 텍스트 필드
         case addButtonTapped // 추가 버튼 탭
@@ -46,7 +48,7 @@ struct TodoListFeature {
                 
                 // 새 Todo 만들어서 배열에 추가
                 let newTodo = TodoRowFeature.State(
-                    id: UUID(),
+                    id: self.uuidGenerator(),
                     title: state.inputText,
                     isCompleted: false
                 )
